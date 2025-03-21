@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>عداد الأموال</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <title>الأموال</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -103,74 +101,43 @@
   </style>
 </head>
 <body>
-  <h1>عداد الأموال</h1>
+  <h1>الأموال</h1>
   <div class="container" id="counters"></div>
   <div class="grand-total">المجموع الكلي: <span id="grand-total">0</span> ريال</div>
-  
-<script type="module">
-  // استيراد Firebase بالطريقة الصحيحة
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-  // إعداد Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyD-EGE7RNF-D1jjcXlPhtd8RhLPVz3tfaQ",
-    authDomain: "moneyyy-3d8df.firebaseapp.com",
-    databaseURL: "https://moneyyy-3d8df-default-rtdb.firebaseio.com",
-    projectId: "moneyyy-3d8df",
-    storageBucket: "moneyyy-3d8df.appspot.com",
-    messagingSenderId: "344193424098",
-    appId: "1:344193424098:web:b357f89123dc49bb8ab833"
-  };
+  <script>
+    const categories = [
+      { value: 500, label: "خمس مئة ريال (500)" },
+      { value: 100, label: "مئة ريال (100)" },
+      { value: 50, label: "خمسون ريال (50)" },
+      { value: 10, label: "عشرة ريالات (10)" },
+      { value: 5, label: "خمسة ريالات (5)" }
+    ];
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const dbRef = ref(db, "counterData");
-
-  const categories = [
-    { value: 500, label: "خمس مئة ريال (500)" },
-    { value: 100, label: "مئة ريال (100)" },
-    { value: 50, label: "خمسون ريال (50)" },
-    { value: 10, label: "عشرة ريالات (10)" },
-    { value: 5, label: "خمسة ريالات (5)" }
-  ];
-
-  let counts = {};
-
-  // تحميل البيانات من Firebase
-  onValue(dbRef, (snapshot) => {
-    counts = snapshot.val() || {};
+    let counts = JSON.parse(localStorage.getItem("counts")) || {};
     categories.forEach(cat => {
       if (!(cat.value in counts)) counts[cat.value] = 0;
     });
-    renderCounters();
-    updateGrandTotal();
-  });
 
-  function updateCounter(value) {
-    const input = document.getElementById(`count-${value}`);
-    counts[value] = parseInt(input.value) || 0;
-    document.getElementById(`total-${value}`).innerText = counts[value] * value;
-    updateGrandTotal();
-    set(dbRef, counts);
-  }
+    function updateCounter(value) {
+      document.getElementById(`count-${value}`).value = counts[value];
+      document.getElementById(`total-${value}`).innerText = counts[value] * value;
+      updateGrandTotal();
+      localStorage.setItem("counts", JSON.stringify(counts));
+    }
 
-  function changeCount(value, delta) {
-    const input = document.getElementById(`count-${value}`);
-    let newValue = (parseInt(input.value) || 0) + delta;
-    if (newValue < 0) newValue = 0;
-    input.value = newValue;
-    updateCounter(value);
-  }
+    function changeCount(value, delta) {
+      counts[value] += delta;
+      if (counts[value] < 0) counts[value] = 0;
+      updateCounter(value);
+    }
 
-  function updateGrandTotal() {
-    const total = categories.reduce((sum, cat) => sum + (counts[cat.value] * cat.value), 0);
-    document.getElementById("grand-total").innerText = total + ' ريال';
-  }
+    function updateGrandTotal() {
+      const total = categories.reduce((sum, cat) => sum + (counts[cat.value] * cat.value), 0);
+      document.getElementById("grand-total").innerText = total + ' ريال';
+    }
 
-  function renderCounters() {
     const container = document.getElementById("counters");
-    container.innerHTML = "";
     categories.forEach(cat => {
       const div = document.createElement("div");
       div.className = "counter";
@@ -180,13 +147,13 @@
           <button onclick="changeCount(${cat.value}, 1)">+</button>
           <button onclick="changeCount(${cat.value}, -1)">-</button>
         </div>
-        <input type="number" class="count" id="count-${cat.value}" value="${counts[cat.value]}" oninput="updateCounter(${cat.value})" />
+        <input type="number" class="count" id="count-${cat.value}" value="${counts[cat.value]}" oninput="counts[${cat.value}] = parseInt(this.value) || 0; updateCounter(${cat.value})" />
         <span class="label">${cat.label}</span>
       `;
       container.appendChild(div);
     });
-  }
-</script>
 
+    updateGrandTotal();
+  </script>
 </body>
 </html>
