@@ -1,108 +1,162 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عداد الفئات</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            direction: rtl;
-        }
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .counter {
-            margin: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 250px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .total-box {
-            width: 80px;
-            height: 40px;
-            border: 2px solid blue;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .grand-total {
-            margin-top: 20px;
-            font-size: 22px;
-            font-weight: bold;
-            padding: 10px;
-            border: 2px solid red;
-            display: inline-block;
-        }
-        button {
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عداد الفئات</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .counter {
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 90%;
+      max-width: 500px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      gap: 15px;
+    }
+
+    .counter span.label {
+      flex: 2;
+      font-size: 18px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .counter input.count {
+      width: 60px;
+      text-align: center;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px;
+    }
+
+    .total-box {
+      width: 90px;
+      height: 45px;
+      background-color: #e3f2fd;
+      color: #0d47a1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #1976d2;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0d47a1;
+    }
+
+    .grand-total {
+      margin-top: 40px;
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      color: #b71c1c;
+    }
+  </style>
 </head>
 <body>
-    <h1>عداد الفئات</h1>
-    <div class="container" id="counters"></div>
-    <div class="grand-total">المجموع الكلي: <span id="grand-total">0</span></div>
-    
-    <script>
-        const categories = [
-            { value: 500, label: "خمس مئة ريال (500)" },
-            { value: 100, label: "مئة ريال (100)" },
-            { value: 50, label: "خمسون ريال (50)" },
-            { value: 10, label: "عشرة ريالات (10)" },
-            { value: 5, label: "خمسة ريالات (5)" }
-        ];
-        
-        let counts = JSON.parse(localStorage.getItem("counts")) || {};
-        categories.forEach(cat => {
-            if (!(cat.value in counts)) counts[cat.value] = 0;
-        });
-        
-        function updateCounter(value) {
-            document.getElementById(`count-${value}`).innerText = counts[value];
-            document.getElementById(`total-${value}`).innerText = counts[value] * value;
-            updateGrandTotal();
-            localStorage.setItem("counts", JSON.stringify(counts));
-        }
-        
-        function changeCount(value, delta) {
-            counts[value] += delta;
-            if (counts[value] < 0) counts[value] = 0;
-            updateCounter(value);
-        }
-        
-        function updateGrandTotal() {
-            let total = categories.reduce((sum, cat) => sum + (counts[cat.value] * cat.value), 0);
-            document.getElementById("grand-total").innerText = total;
-        }
-        
-        const container = document.getElementById("counters");
-        categories.forEach(cat => {
-            const div = document.createElement("div");
-            div.className = "counter";
-            div.innerHTML = `
-                <div class="total-box" id="total-${cat.value}">${counts[cat.value] * cat.value}</div>
-                <button onclick="changeCount(${cat.value}, 1)">+</button>
-                <span>${cat.label}:</span>
-                <span id="count-${cat.value}">${counts[cat.value]}</span>
-                <button onclick="changeCount(${cat.value}, -1)">-</button>
-            `;
-            container.appendChild(div);
-        });
-        
-        updateGrandTotal();
-    </script>
+  <h1>عداد الفئات</h1>
+  <div class="container" id="counters"></div>
+  <div class="grand-total">المجموع الكلي: <span id="grand-total">0</span> ريال</div>
+
+  <script>
+    const categories = [
+      { value: 500, label: "خمس مئة ريال (500)" },
+      { value: 100, label: "مئة ريال (100)" },
+      { value: 50, label: "خمسون ريال (50)" },
+      { value: 10, label: "عشرة ريالات (10)" },
+      { value: 5, label: "خمسة ريالات (5)" }
+    ];
+
+    let counts = JSON.parse(localStorage.getItem("counts")) || {};
+    categories.forEach(cat => {
+      if (!(cat.value in counts)) counts[cat.value] = 0;
+    });
+
+    function updateCounter(value) {
+      const input = document.getElementById(`count-${value}`);
+      counts[value] = parseInt(input.value) || 0;
+      document.getElementById(`total-${value}`).innerText = counts[value] * value;
+      updateGrandTotal();
+      localStorage.setItem("counts", JSON.stringify(counts));
+    }
+
+    function changeCount(value, delta) {
+      const input = document.getElementById(`count-${value}`);
+      let newValue = (parseInt(input.value) || 0) + delta;
+      if (newValue < 0) newValue = 0;
+      input.value = newValue;
+      updateCounter(value);
+    }
+
+    function updateGrandTotal() {
+      const total = categories.reduce((sum, cat) => sum + (counts[cat.value] * cat.value), 0);
+      document.getElementById("grand-total").innerText = total + ' ريال';
+    }
+
+    const container = document.getElementById("counters");
+    categories.forEach(cat => {
+      const div = document.createElement("div");
+      div.className = "counter";
+      div.innerHTML = `
+        <div class="total-box" id="total-${cat.value}">${counts[cat.value] * cat.value}</div>
+        <div class="buttons">
+          <button onclick="changeCount(${cat.value}, 1)">+</button>
+          <button onclick="changeCount(${cat.value}, -1)">-</button>
+        </div>
+        <input type="number" class="count" id="count-${cat.value}" value="${counts[cat.value]}" oninput="updateCounter(${cat.value})" />
+        <span class="label">${cat.label}</span>
+      `;
+      container.appendChild(div);
+    });
+
+    updateGrandTotal();
+  </script>
 </body>
 </html>
